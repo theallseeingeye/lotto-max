@@ -4,12 +4,12 @@ import styled from 'styled-components'
 
 const Titles = styled.tr`
 	//display: flex;
-	//border: solid black;
+	border-color: black;
 	//justify-content: space-evenly;
 `;
 
 const Table = styled.table`
-	width: 100%;
+	//width: 100%;
 `;
 
 
@@ -21,13 +21,17 @@ export function Main() {
 			<Table>
 				<tbody>
 					<Titles>
+						<th>Count</th>
 						<th>Winning Numbers</th>
-						<th>Bonus Number</th>
-						<th>Your Picks</th>
-						<th>Winners</th>
 						<th>Bonus</th>
+						<th>Your Picks</th>
+						<th>Won</th>
+						<th>Bonus <br/>Won</th>
+						<th>Prize</th>
+						<th>Gain/Loss</th>
+						<th>Total</th>
 					</Titles>
-					{displayPlays(20, 3)}
+					{displayPlays(500, 3)}
 				</tbody>
 			</Table>
 		</div>

@@ -32,9 +32,7 @@ const Column = styled.div`
 const Row = styled.div`
 	display: flex;
 	flex-direction: row;
-	//width: 100%;
-	border: solid pink;
-	//justify-content: space-evenly;
+	justify-content: center;
 `;
 
 const WinningNumbers = styled.div`
@@ -43,13 +41,19 @@ const WinningNumbers = styled.div`
 	flex-direction: row;
 `;
 
+const jackpotPrize = 10000000;
+const numberOfPlayers = 30000000 * 0.1;
+const poolFunds = numberOfPlayers * 5 * 0.521 - jackpotPrize;
 
 export function displayPlays(amount, numberOfPlays, manualPick = null) {
 	let list = [];
-	for (let i = 0; i <= amount; i++) {
+	for (let i = 0; i < amount; i++) {
 		const results = drawResults(true);
 		list.push(
-			<tr style={{border: 'solid yellow'}}>
+			<tr key={uuidv4()}>
+				<td>
+					{i + 1}
+				</td>
 				{renderDrawResults(results)}
 				{renderUserNumbers(numberOfPlays, results, manualPick)}
 			</tr>
@@ -104,17 +108,91 @@ function drawResults(includeBonus) {
 	return includeBonus ? {selectedBalls, bonusBall} : {selectedBalls};
 }
 
+function prizeInfo(winningCount, wonBonus) {
+	if (wonBonus) {
+		switch(winningCount) {
+			case 3:
+				return {
+					amount: 20,
+					details: '$20'
+				};
+			case 4:
+				const four = (0.0275 * poolFunds) / (numberOfPlayers * (1/1105));
+				return {
+					amount: four,
+					details: four
+				};
+			case 5:
+				const five = (0.015 * poolFunds) / (numberOfPlayers * (1 / 37749));
+				return {
+					amount: five,
+					details: five
+				};
+			case 6:
+				const six = (0.025 * poolFunds) / (numberOfPlayers * (1 / 4756400));
+				return {
+					amount: six,
+					details: six
+				};
+			case 7:
+				return {
+					amount: jackpotPrize + poolFunds * 0.8725,
+					details: 'JACKPOT!!!!!'
+				};
+			default:
+				return {
+					amount: -5,
+					details: '-'
+				};
+		}
+
+	} else {
+		// DID NOT WIN BONUS
+		switch(winningCount) {
+			case 3:
+				return {
+					amount: 5,
+					details: '$5 - Free Play'
+				};
+			case 4: {
+				return {
+					amount: 20,
+					details: '$20'
+				};
+			}
+			case 5:
+				const five = (0.0375 * poolFunds) / (numberOfPlayers * (1/1841));
+				return {
+					amount: five,
+					details: five
+				};
+			case 6:
+				const six = (0.025 * poolFunds) / (numberOfPlayers * (1 / 113248));
+				return {
+					amount: six,
+					details: six
+				};
+			default:
+				return {
+					amount: -5,
+					details: '-'
+				}
+		}
+	}
+}
+
 function findWinners(lotteryResults, userNumbers) {
 	const wonBonuses = [];
 	const winningCounts = [];
 	const renderPlays = [];
-
+	const prizeDetails = [];
 	// Go through each play
 
 		userNumbers.forEach((play) => {
 			const renderNumber = [];
 			let winningCount = 0;
-			let wonBonus = 'false';
+			let wonBonus = false;
+
 			// Check numbers of each play.
 			play.forEach((number) => {
 
@@ -133,7 +211,7 @@ function findWinners(lotteryResults, userNumbers) {
 					)
 				} else if (number === lotteryResults.bonusBall) {
 					// Matched bonus!
-					wonBonus = String(true);
+					wonBonus = true;
 					renderNumber.push(
 						<NumberBox
 							key={uuidv4()}
@@ -157,33 +235,44 @@ function findWinners(lotteryResults, userNumbers) {
 		});
 
 		renderPlays.push(
-			<Row>
+			<Row key={uuidv4()}>
 				{renderNumber}
 			</Row>
 		);
 		winningCounts.push(
-			<Row>
-				{winningCount}
+			<Row key={uuidv4()}>
+				{winningCount ? winningCount : '-'}
 			</Row>
 		);
 		wonBonuses.push(
-			<Row>
-				{wonBonus}
+			<Row
+				style={{backgroundColor: `${wonBonus ? 'lightGreen' : 'pink'}`}}
+				key={uuidv4()}
+			>
+				{wonBonus ? 'Yes' : '-'}
+			</Row>
+		);
+		prizeDetails.push(
+			<Row
+				key={uuidv4()}
+			>
+				{prizeInfo(winningCount, wonBonus).details}
 			</Row>
 		)
 
 	});
-	return [
+	return {
 		wonBonuses,
 		winningCounts,
-		renderPlays
-	];
+		renderPlays,
+		prizeDetails
+	};
 }
 
 
 function renderUserPicks(userPicks, results) {
 	// Loop through the userPicks and highlight winners
-	const [wonBonuses, winningCounts, renderPlays] = findWinners(results, userPicks);
+	const {wonBonuses, winningCounts, renderPlays, prizeDetails} = findWinners(results, userPicks);
 	return (
 		<>
 			<td>
@@ -199,6 +288,11 @@ function renderUserPicks(userPicks, results) {
 			<td>
 				<Column>
 					{wonBonuses}
+				</Column>
+			</td>
+			<td>
+				<Column>
+					{prizeDetails}
 				</Column>
 			</td>
 		</>
