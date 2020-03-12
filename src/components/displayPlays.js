@@ -5,7 +5,7 @@ import styled from "styled-components";
 const Results = styled.div`
 	//width: 20px;
 	display: flex;
-	
+	border: solid purple;
 `;
 
 const NumberBox = styled.div`
@@ -19,12 +19,22 @@ const NumberBox = styled.div`
 
 const UserNumbers = styled.div`
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	border: solid green;
+`;
+
+const Column = styled.div`
+	display: flex;
+	flex-direction: column;
+	border: solid black;
 `;
 
 const Row = styled.div`
 	display: flex;
+	flex-direction: row;
+	//width: 100%;
+	border: solid pink;
+	//justify-content: space-evenly;
 `;
 
 const WinningNumbers = styled.div`
@@ -33,27 +43,32 @@ const WinningNumbers = styled.div`
 	flex-direction: row;
 `;
 
-const WinningNumbersContainer = styled.div`
-	
-`;
 
-
-export function displayPlays(amount, manualPick = null) {
+export function displayPlays(amount, numberOfPlays, manualPick = null) {
 	let list = [];
 	for (let i = 0; i <= amount; i++) {
 		const results = drawResults(true);
 		list.push(
-			<Results key={uuidv4()}>
+			<tr style={{border: 'solid yellow'}}>
 				{renderDrawResults(results)}
-				<UserNumbers>
-					{userPlays(3, results, manualPick)}
-				</UserNumbers>
-			</Results>
+				{renderUserNumbers(numberOfPlays, results, manualPick)}
+			</tr>
 		)
 	}
 	return list;
 }
 
+function quickPicks(numberOfPlays, manualPick) {
+	let pickedNumbers = [];
+	for (let i = 1; i < numberOfPlays; i++) {
+		// The first number can be chosen by the user.
+		if (i === 1) pickedNumbers.push(
+			manualPick ? manualPick : drawResults().selectedBalls
+		);
+		pickedNumbers.push(drawResults().selectedBalls);
+	}
+	return pickedNumbers;
+}
 
 function generateBalls(numberOfBalls) {
 	// Generate 'balls' to be chosen from.
@@ -90,71 +105,109 @@ function drawResults(includeBonus) {
 }
 
 function findWinners(lotteryResults, userNumbers) {
-	const winningNumbers = [];
-	let winningBonusBall = null;
-	for (let i = 0; i <= lotteryResults.selectedBalls.length; i++) {
-		userNumbers.selectedBalls.forEach((number) => {
-			if (number === lotteryResults.bonusBall) winningBonusBall = lotteryResults.bonusBall;
-			if (number === lotteryResults.selectedBalls[i]) {
-				winningNumbers.push(number);
-			}
-		})
-	}
-	return {
-		winningBonusBall,
-		winningNumbers
-	}
-}
+	const wonBonuses = [];
+	const winningCounts = [];
+	const renderPlays = [];
 
-function numberBox(number, winners) {
-	const winningNumber = winners.winningNumbers.some(v => v === number);
-	return (
-		<NumberBox
-			key={number}
-			style={{
-				backgroundColor: `${
-					winners.winningBonusBall === number ? 'yellow' :
-						winningNumber ? 'lightGreen' : 'white'
-					}`
-			}}
-		>
-			{number}
-		</NumberBox>
-	)
-}
+	// Go through each play
 
-function renderUserPicks(results, userNumbers) {
-	const winners = findWinners(results, userNumbers);
-	let pickedNumbers = [];
+		userNumbers.forEach((play) => {
+			const renderNumber = [];
+			let winningCount = 0;
+			let wonBonus = 'false';
+			// Check numbers of each play.
+			play.forEach((number) => {
 
-	userNumbers.selectedBalls.forEach((number) => {
-		pickedNumbers.push(numberBox(number, winners))
+				if (lotteryResults.selectedBalls.some((drawn) => drawn === number)) {
+					// A number was found!
+					winningCount = ++winningCount;
+					renderNumber.push(
+						<NumberBox
+							key={uuidv4()}
+							style={{
+								backgroundColor: 'lightGreen'
+							}}
+						>
+							{number}
+						</NumberBox>
+					)
+				} else if (number === lotteryResults.bonusBall) {
+					// Matched bonus!
+					wonBonus = String(true);
+					renderNumber.push(
+						<NumberBox
+							key={uuidv4()}
+							style={{
+								backgroundColor: 'yellow'
+							}}
+						>
+							{number}
+						</NumberBox>
+					)
+				} else {
+					// This number is a loser.
+					renderNumber.push(
+						<NumberBox
+							key={uuidv4()}
+						>
+							{number}
+						</NumberBox>
+					)
+				}
+		});
+
+		renderPlays.push(
+			<Row>
+				{renderNumber}
+			</Row>
+		);
+		winningCounts.push(
+			<Row>
+				{winningCount}
+			</Row>
+		);
+		wonBonuses.push(
+			<Row>
+				{wonBonus}
+			</Row>
+		)
+
 	});
+	return [
+		wonBonuses,
+		winningCounts,
+		renderPlays
+	];
+}
+
+
+function renderUserPicks(userPicks, results) {
+	// Loop through the userPicks and highlight winners
+	const [wonBonuses, winningCounts, renderPlays] = findWinners(results, userPicks);
 	return (
-		<Row>
-
-			{pickedNumbers}
-
-			Number of Matches:
-			{winners.winningNumbers.length}
-			{winners.winningBonusBall ?
-				<div>
-					Winning Bonus: {winners.winningBonusBall}
-				</div>
-				: null
-			}
-
-		</Row>
+		<>
+			<td>
+				<Column>
+					{renderPlays}
+				</Column>
+			</td>
+			<td>
+				<Column>
+				{winningCounts}
+				</Column>
+			</td>
+			<td>
+				<Column>
+					{wonBonuses}
+				</Column>
+			</td>
+		</>
 	)
 }
 
-function renderUserNumbers(results, manualPick) {
-	const userNumbers = manualPick ? {selectedBalls: manualPick} : drawResults();
-	return (
-		<Results key={uuidv4()}>
-			{renderUserPicks(results, userNumbers)}
-		</Results>
-	)
+function renderUserNumbers(numberOfPlays, results, manualPick) {
+	const userPicks = quickPicks(numberOfPlays, manualPick);
+	return renderUserPicks(userPicks, results)
 }
 
 function renderDrawResults(results) {
@@ -163,34 +216,23 @@ function renderDrawResults(results) {
 	results.selectedBalls.forEach((number) => {
 		lotteryResultsList.push(
 			<NumberBox key={uuidv4()}>
-				{number}
+					{number}
 			</NumberBox>
 		)
 	});
-	// Add bonus number
-	lotteryResultsList.push(
-		<NumberBox key={uuidv4()} style={{backgroundColor: 'yellow'}}>
-			{results.bonusBall}
-		</NumberBox>
-	);
 
 	return (
-		<WinningNumbersContainer>
-			<WinningNumbers>
-				{lotteryResultsList}
-			</WinningNumbers>
-		</WinningNumbersContainer>
+		<>
+			<td style={{border: 'solid red'}}>
+				<Row>
+					{lotteryResultsList}
+				</Row>
+			</td>
+			<td style={{border: 'solid green'}}>
+				<NumberBox>
+					{results.bonusBall}
+				</NumberBox>
+			</td>
+		</>
 	)
 }
-
-function userPlays(numberOfPlays, results, manualPick) {
-	let plays = [];
-	for (let i = 1; i < numberOfPlays; i++) {
-		// Only the first number can be manually picked, the other two must be quick picked.
-		if (i === 1) plays.push(renderUserNumbers(results, manualPick));
-		plays.push(renderUserNumbers(results))
-	}
-	return plays
-}
-
-
