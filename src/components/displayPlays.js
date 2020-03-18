@@ -1,12 +1,6 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {v4 as uuidv4} from "uuid";
 import styled from "styled-components";
-
-const Results = styled.div`
-	//width: 20px;
-	display: flex;
-	border: solid purple;
-`;
 
 const NumberBox = styled.div`
 	width: 20px;
@@ -15,12 +9,6 @@ const NumberBox = styled.div`
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
-`;
-
-const UserNumbers = styled.div`
-	display: flex;
-	flex-direction: row;
-	border: solid green;
 `;
 
 const Column = styled.div`
@@ -35,17 +23,89 @@ const Row = styled.div`
 	justify-content: center;
 `;
 
-const WinningNumbers = styled.div`
-	border: solid yellow;
-	display: flex;
-	flex-direction: row;
+const Titles = styled.tr`
+	//display: flex;
+	border-color: black;
+	//justify-content: space-evenly;
 `;
 
-const jackpotPrize = 10000000;
-const numberOfPlayers = 30000000 * 0.1;
-const poolFunds = numberOfPlayers * 5 * 0.521 - jackpotPrize;
+const Table = styled.table`
+	//width: 100%;
+`;
 
-export function displayPlays(amount, numberOfPlays, manualPick = null) {
+
+const wclc = {
+	prizes: 0.521,
+	operatingCost: 0.068,
+	retailCommission: 0.07,
+	printing: 0.01,
+	provinceRev: 0.331,
+};
+const jackpotPrize = 10000000;
+const canadianPop = 37590000;
+const playerPercentage = 0.25;
+const ticketPrice = 5;
+const numberOfPlayers = canadianPop * playerPercentage;
+const ticketSales = numberOfPlayers * ticketPrice;
+const prizePool = ticketSales * wclc.prizes;
+// The lottomax removes the fixed prizes first, then distribute the rest under the pool.
+
+
+console.log(prizePool);
+
+const pool = ticketSales > jackpotPrize ? ticketSales - jackpotPrize : jackpotPrize;
+const poolFunds = pool <= 0 ? jackpotPrize * (1-0.8725) : pool * (1-0.8725);
+
+export const prizesWon = {
+	three: 0,
+	threeBonus: 0,
+	four: 0,
+	fourBonus: 0,
+	five: 0,
+	fiveBonus: 0,
+	six: 0,
+	sixBonus: 0,
+	jackpot: 0,
+};
+
+export const collectiveWinnings = {
+	three: 0,
+	threeBonus: 0,
+	four: 0,
+	fourBonus: 0,
+	five: 0,
+	fiveBonus: 0,
+	six: 0,
+	sixBonus: 0,
+	jackpot: 0,
+};
+
+
+export function RenderedDraws(props) {
+
+	return (
+		<Table>
+			<tbody>
+			<Titles>
+				<th>Count</th>
+				<th>Winning Numbers</th>
+				<th>Bonus</th>
+				<th>Your Picks</th>
+				<th>Won</th>
+				<th>Bonus <br/>Won</th>
+				<th>Prize</th>
+				<th>Gain/Loss</th>
+				<th>Total</th>
+			</Titles>
+			{displayPlays(props.playsPerMonth, 3, props.play)}
+			</tbody>
+		</Table>
+	)
+}
+
+export const numbersWon = generateEmptyNumberArray(50);
+
+function displayPlays(amount, numberOfPlays, play, manualPick = null,) {
 	let list = [];
 	for (let i = 0; i < amount; i++) {
 		const results = drawResults(true);
@@ -60,6 +120,18 @@ export function displayPlays(amount, numberOfPlays, manualPick = null) {
 		)
 	}
 	return list;
+}
+
+function generateEmptyNumberArray(numberOfBalls) {
+	// Generate 'balls' to be chosen from.
+	const balls = [];
+	for (let i = 1; i <= numberOfBalls; i++) {
+		balls.push({
+			id: i,
+			count: 0
+		});
+	}
+	return balls;
 }
 
 function quickPicks(numberOfPlays, manualPick) {
@@ -83,6 +155,12 @@ function generateBalls(numberOfBalls) {
 	return balls;
 }
 
+function getRandomInt(min, max) {
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
 function drawResults(includeBonus) {
 	const balls = generateBalls(50);
 	const selectedBalls = [];
@@ -91,8 +169,9 @@ function drawResults(includeBonus) {
 
 	for (let i = 0; i <= numberOfPicks; i++) {
 		// Random number generated.
-		const rand = Math.random();
-		const selectedIndex = Math.round((balls.length - 1) * rand);
+		// const selectedIndex = Math.round((balls.length - 1) * rand);
+		const selectedIndex = getRandomInt(0, balls.length);
+
 		if (typeof selectedIndex !== "number") console.error('ERROR! COULD NOT FIND INDEX OF BALLS TO PICK FROM', selectedIndex);
 
 		if (i === 7) {
@@ -112,36 +191,47 @@ function prizeInfo(winningCount, wonBonus) {
 	if (wonBonus) {
 		switch(winningCount) {
 			case 3:
+				prizesWon.threeBonus = prizesWon.threeBonus + 1;
+				collectiveWinnings.threeBonus = collectiveWinnings.threeBonus + 20;
 				return {
-					amount: 20,
+					value: 20,
 					details: '$20'
 				};
 			case 4:
-				const four = (0.0275 * poolFunds) / (numberOfPlayers * (1/1105));
+				const four = Math.round((0.0275 * poolFunds) / (numberOfPlayers * (1/1105)));
+				prizesWon.fourBonus = prizesWon.fourBonus + 1;
+				collectiveWinnings.fourBonus = collectiveWinnings.fourBonus + four;
+				prizesWon.fourBonus = prizesWon.fourBonus + 1;
 				return {
-					amount: four,
+					value: four,
 					details: four
 				};
 			case 5:
-				const five = (0.015 * poolFunds) / (numberOfPlayers * (1 / 37749));
+				const five = Math.round((0.015 * poolFunds) / (numberOfPlayers * (1 / 37749)));
+				collectiveWinnings.fiveBonus = collectiveWinnings.fiveBonus + five;
+				prizesWon.fiveBonus = prizesWon.fiveBonus + 1;
 				return {
-					amount: five,
+					value: five,
 					details: five
 				};
 			case 6:
-				const six = (0.025 * poolFunds) / (numberOfPlayers * (1 / 4756400));
+				const six = Math.round((0.025 * poolFunds) / (numberOfPlayers * (1 / 4756400)));
+				prizesWon.sixBonus = prizesWon.sixBonus + 1;
+				collectiveWinnings.sixBonus = collectiveWinnings.sixBonus + six;
 				return {
-					amount: six,
+					value: six,
 					details: six
 				};
 			case 7:
+				prizesWon.jackpot = prizesWon.jackpot + 1;
+				collectiveWinnings.jackpot = collectiveWinnings.jackpot + Math.round(jackpotPrize + poolFunds * 0.8725);
 				return {
-					amount: jackpotPrize + poolFunds * 0.8725,
+					value: jackpotPrize + poolFunds * 0.8725,
 					details: 'JACKPOT!!!!!'
 				};
 			default:
 				return {
-					amount: -5,
+					value: -5,
 					details: '-'
 				};
 		}
@@ -150,31 +240,46 @@ function prizeInfo(winningCount, wonBonus) {
 		// DID NOT WIN BONUS
 		switch(winningCount) {
 			case 3:
+				prizesWon.three = prizesWon.three + 1;
+				collectiveWinnings.three = collectiveWinnings.three + 5;
 				return {
-					amount: 5,
+					value: 5,
 					details: '$5 - Free Play'
 				};
 			case 4: {
+				prizesWon.four = prizesWon.four + 1;
+				collectiveWinnings.four = collectiveWinnings.four + 20;
 				return {
-					amount: 20,
+					value: 20,
 					details: '$20'
 				};
 			}
 			case 5:
-				const five = (0.0375 * poolFunds) / (numberOfPlayers * (1/1841));
+				const five = Math.round((0.0375 * poolFunds) / (numberOfPlayers * (1/1841)));
+				prizesWon.five = prizesWon.five + 1;
+				collectiveWinnings.five = collectiveWinnings.five + five;
 				return {
-					amount: five,
+					value: five,
 					details: five
 				};
 			case 6:
-				const six = (0.025 * poolFunds) / (numberOfPlayers * (1 / 113248));
+				const six = Math.round((0.025 * poolFunds) / (numberOfPlayers * (1 / 113248)));
+				prizesWon.six = prizesWon.six + 1;
+				collectiveWinnings.six = collectiveWinnings.six + six;
 				return {
-					amount: six,
+					value: six,
 					details: six
+				};
+			case 7:
+				prizesWon.jackpot = prizesWon.jackpot + 1;
+				collectiveWinnings.jackpot = collectiveWinnings.jackpot + Math.round(jackpotPrize + poolFunds * 0.8725);
+				return {
+					value: jackpotPrize + poolFunds * 0.8725,
+					details: 'JACKPOT!!!!!'
 				};
 			default:
 				return {
-					amount: -5,
+					value: -5,
 					details: '-'
 				}
 		}
@@ -198,6 +303,7 @@ function findWinners(lotteryResults, userNumbers) {
 
 				if (lotteryResults.selectedBalls.some((drawn) => drawn === number)) {
 					// A number was found!
+					numbersWon[number-1].count = numbersWon[number-1].count + 1 ;
 					winningCount = ++winningCount;
 					renderNumber.push(
 						<NumberBox
@@ -211,6 +317,7 @@ function findWinners(lotteryResults, userNumbers) {
 					)
 				} else if (number === lotteryResults.bonusBall) {
 					// Matched bonus!
+					numbersWon[number-1].count = numbersWon[number-1].count + 1 ;
 					wonBonus = true;
 					renderNumber.push(
 						<NumberBox
