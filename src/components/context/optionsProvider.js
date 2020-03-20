@@ -6,12 +6,20 @@ const canadianPop = 37590000;
 const playerPercentage = 0.25;
 const canadianPlayers = canadianPop * playerPercentage;
 
+const wclc = {
+	prizes: 0.521,
+	operatingCost: 0.068,
+	retailCommission: 0.07,
+	printing: 0.01,
+	provinceRev: 0.331,
+};
+
 export function OptionsProvider({children}) {
-	const [startAge, setStartAge] = useState(18);
 	const [delay, setDelay] = useState(0);
-	const [playsPerMonth, setPlaysPerMonth] = useState(8);
-	const [play, setPlay] = useState(false);
 	const [endAge, setEndAge] = useState(85);
+	const [entriesPerGame, setEntriesPerGame] = useState(3);
+	const [jackpotPrize, setJackpotPrize] = useState(12000000);
+	const [numberOfPlayers, setNumberOfPlayers] = useState(canadianPlayers);
 	const [odds, setOdds] = useState({
 		three: 1 / 8.5,
 		threeBonus: 1 / 82.9,
@@ -23,9 +31,10 @@ export function OptionsProvider({children}) {
 		sixBonus: 1 / 4756400,
 		jackpot: 1 / 33294800,
 	});
-	const [numberOfPlayers, setNumberOfPlayers] = useState(canadianPlayers);
+	const [playsPerMonth, setPlaysPerMonth] = useState(8);
+	const [play, setPlay] = useState(false);
+	const [startAge, setStartAge] = useState(18);
 	const [ticketPrice, setTicketPrice] = useState(5);
-	const [jackpotPrize, setJackpotPrize] = useState(12000000);
 
 	return (
 		<OptionsContext.Provider value={{
@@ -33,16 +42,17 @@ export function OptionsProvider({children}) {
 			setStartAge,
 			delay,
 			setDelay,
-			playsPerMonth,
-			setPlaysPerMonth,
 			play,
 			setPlay,
+			playsPerMonth,
+			setPlaysPerMonth,
 			endAge,
 			setEndAge,
 			odds,
 			numberOfPlayers,
 			ticketPrice,
 			jackpotPrize,
+			entriesPerGame,
 		}}>
 			{children}
 		</OptionsContext.Provider>

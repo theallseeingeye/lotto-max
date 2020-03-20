@@ -28,9 +28,7 @@ export function StatsProvider({children}) {
 	}
 
 	function updatePrizeWon(prizeType) {
-			console.log(prizeType);
 		setPrizesWon((prizesWon) => {
-			console.log('inside', prizesWon);
 			return ({
 				...prizesWon,
 				[prizeType]: prizesWon[prizeType] + 1
