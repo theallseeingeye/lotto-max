@@ -1,8 +1,11 @@
-import React from 'react'
-import {prizesWon, collectiveWinnings} from "./displayPlays";
+import React, {useContext} from 'react'
+import {collectiveWinnings} from "./displayPlays";
+import {StatsContext} from "./context/statsProvider";
 
 
-export function Stats({playsPerMonth, counter}) {
+export function Stats() {
+	const {monthCount, playCount, prizesWon} = useContext(StatsContext);
+
 	return (
 		<div>
 			Stats
@@ -115,9 +118,9 @@ export function Stats({playsPerMonth, counter}) {
 				</tbody>
 			</table>
 
-			Months {counter} <br/>
-			Years {Math.round(counter / 12)} <br/>
-			Plays {counter * playsPerMonth} <br/>
+			Months {monthCount} <br/>
+			Years {Math.round(monthCount / 12)} <br/>
+			Plays {playCount} <br/>
 
 		</div>
 	)

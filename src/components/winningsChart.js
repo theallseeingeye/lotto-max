@@ -1,8 +1,10 @@
-import React, {useEffect} from 'react'
+import React, {useContext} from 'react'
 import {ResponsiveBarCanvas} from "@nivo/bar";
-import {prizesWon} from "./displayPlays";
+import {StatsContext} from "./context/statsProvider";
 
 export function WinningsChart() {
+	const {prizesWon} = useContext(StatsContext);
+
 	const data = [
 		{
 			"prize": "3",

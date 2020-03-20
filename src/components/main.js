@@ -1,66 +1,40 @@
-import React, {useState, useEffect, useLayoutEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {RenderedDraws} from "./displayPlays";
 import styled from 'styled-components'
 import {WinningsChart} from "./winningsChart";
 import {NumbersWonChart} from "./numbersWonChart";
 import {Stats} from "./stats";
+import {WinLoss} from "./winLoss";
+import {Header} from "./header";
+import {Options} from "./options";
+import {OptionsContext} from "./context/optionsProvider";
+import {StatsContext} from "./context/statsProvider";
 
 export function Main() {
-	const [counter, setCounter] = useState(0);
-	const [playsPerMonth, setPlaysPerMonth] = useState(8);
-	const [play, setPlay] = useState(false);
-	const [delay, setDelay] = useState(0);
-	const [prevDelay, setPrevDelay] = useState(0);
+	const {delay, play, setPlay} = useContext(OptionsContext);
+	const {accumulateMonthCount, monthCount} = useContext(StatsContext);
 
 	useEffect(() => {
-		// if (play) setCounter(() => counter + 1);
-		if (play) setTimeout(() => {setCounter(counter => counter + 1) }, delay)
-	}, [counter, play]);
-	//
-	// function calculateDelay() {
-	// 	// Calculate the delay based on speed of calculations;
-	//
-	// }
-	// useEffect(() => {
-	// 	// console.log('DELAYED', Date.now())
-	// 	// Save current delay
-	// 	setPrevDelay(Date.now());
-	// 	// Compare to previous delay
-	// 	const diff = Date.now() - prevDelay;
-	// 	const convertMilSecToYears = 31536000000;
-	// 	// console.log('months per sec', diff/60);
-	//
-	// 	// Numbers of plays per second.
-	// 	console.log('plays per sec', (diff/60)*counter);
-	// }, [counter]);
+		if (play) setTimeout(() => {accumulateMonthCount()}, delay)
+	}, [monthCount, play]);
+
 
 	return(
 		<div>
-			<div>
-				Options <br/>
-
-				Number of Plays per Month
-				<input type='range' min="1" max='8' defaultValue={8} onChange={(e) => setPlaysPerMonth(e.target.value)}/>
-				Delay
-				<input type='range' min="1" max='200' defaultValue={8} onChange={(e) => setDelay(e.target.value)}/>
-
-			</div>
+			<Header/>
+			<Options/>
 			<button onClick={() => setPlay(play => !play)}>
 				{play ? 'Stop' : 'Play'}
 			</button>
-
-			<Stats counter={counter} playsPerMonth={playsPerMonth}/>
-
+			<RenderedDraws/>
+			{/*<Stats/>*/}
+			{/*<WinLoss/>*/}
 			<div style={{height: '300px', width: '50%'}}>
-				<WinningsChart/>
+				{/*<WinningsChart/>*/}
 			</div>
 			<div style={{height: '1000px', width: '50%'}}>
-			<NumbersWonChart/>
+				{/*<NumbersWonChart/>*/}
 			</div>
-			<RenderedDraws
-				playsPerMonth={playsPerMonth}
-				play={play}
-			/>
 		</div>
 	)
 }

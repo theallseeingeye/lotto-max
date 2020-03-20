@@ -26,6 +26,12 @@ module.exports = {
 					minimize: true,
 				},
 			},
+			{
+				test: /\.(png|svg|jpg|gif)$/,
+				use: [
+					'file-loader'
+				]
+			},
 		]
 	},
 	plugins: [
