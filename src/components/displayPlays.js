@@ -1,7 +1,10 @@
-import React, {useContext} from 'react';
+import React, {useContext, useLayoutEffect, useEffect} from 'react';
 import {v4 as uuidv4} from "uuid";
 import styled from "styled-components";
 import {OptionsContext} from "./context/optionsProvider";
+import {usePrizeInfo} from "./usePrizeInfo";
+import {PrizeInfo} from "./usePrizeInfo";
+import {FindWinners} from "./useFindWinners";
 import {StatsContext} from "./context/statsProvider";
 
 const NumberBox = styled.div`
@@ -126,7 +129,6 @@ export const collectiveWinnings = {
 	jackpot: 0,
 };
 
-export let accumulatePlayCount = 0;
 
 export function RenderedDraws() {
 	return (
@@ -141,28 +143,36 @@ export function RenderedDraws() {
 				<th>Bonus <br/>Won</th>
 				<th>Prize</th>
 			</Titles>
-			{displayPlays()}
+			<DisplayPlays/>
 			</tbody>
 		</Table>
 	)
 }
 
 export const numbersWon = generateEmptyNumberArray(50);
+export let accumulatePlayCount = 0;
 
-function displayPlays(manualPick = null,) {
+function DisplayPlays(manualPick = null) {
+
 	const {playsPerMonth, entriesPerGame} = useContext(OptionsContext);
+
+
 	let list = [];
 	for (let i = 0; i < playsPerMonth; i++) {
 		const results = drawResults(true);
 		accumulatePlayCount = ++accumulatePlayCount;
-		calculateGlobalWinners();
+		// calculateGlobalWinners();
 		list.push(
 			<tr key={uuidv4()}>
 				<td>
 					{i + 1}
 				</td>
-				{renderDrawResults(results)}
-				{renderUserNumbers(entriesPerGame, results, manualPick)}
+				<RenderDrawResults results={results}/>
+				<RenderUserNumbers
+					entriesPerGame={entriesPerGame}
+					results={results}
+					manualPick={null}
+				/>
 			</tr>
 		)
 	}
@@ -241,213 +251,10 @@ function calculatedPrize(poolPercentage, oddsOfWinning) {
 	return Math.round(finalPrize);
 }
 
-function prizeInfo(winningCount, wonBonus) {
-	const {updatePrizeWon} = useContext(StatsContext);
-	if (wonBonus) {
-		switch(winningCount) {
-			case 3:
-				updatePrizeWon('threeBonus');
-				prizesWon.threeBonus = prizesWon.threeBonus + 1;
-				collectiveWinnings.threeBonus = collectiveWinnings.threeBonus + 20;
-				return {
-					value: 20,
-					details: '$20'
-				};
-			case 4:
-				const four = calculatedPrize(0.0275, odds.fourBonus);
-				prizesWon.fourBonus = prizesWon.fourBonus + 1;
-				collectiveWinnings.fourBonus = collectiveWinnings.fourBonus + four;
-				prizesWon.fourBonus = prizesWon.fourBonus + 1;
-				return {
-					value: four,
-					details: four
-				};
-			case 5:
-				const five = calculatedPrize(0.015, odds.fiveBonus);
-				collectiveWinnings.fiveBonus = collectiveWinnings.fiveBonus + five;
-				prizesWon.fiveBonus = prizesWon.fiveBonus + 1;
-				return {
-					value: five,
-					details: five
-				};
-			case 6:
-				const six = calculatedPrize(0.025, odds.sixBonus);
-				prizesWon.sixBonus = prizesWon.sixBonus + 1;
-				collectiveWinnings.sixBonus = collectiveWinnings.sixBonus + six;
-				return {
-					value: six,
-					details: six
-				};
-			case 7:
-				const seven = calculatedPrize(0.8725, odds.jackpot);
-				prizesWon.jackpot = prizesWon.jackpot + 1;
-				collectiveWinnings.jackpot = collectiveWinnings.jackpot + seven;
-				return {
-					value: seven,
-					details: 'JACKPOT!!!!!'
-				};
-			default:
-				return {
-					value: -5,
-					details: '-'
-				};
-		}
-
-	} else {
-		// DID NOT WIN BONUS
-		switch(winningCount) {
-			case 3:
-				prizesWon.three = prizesWon.three + 1;
-				// collectiveWinnings.three = collectiveWinnings.three + 5;
-				// collectiveWinnings.three = ;
-				return {
-					value: 5,
-					details: 'Free Play'
-				};
-			case 4: {
-				prizesWon.four = prizesWon.four + 1;
-				collectiveWinnings.four = collectiveWinnings.four + 20;
-				return {
-					value: 20,
-					details: '$20'
-				};
-			}
-			case 5:
-				const five = calculatedPrize(0.0375, odds.five);
-				prizesWon.five = prizesWon.five + 1;
-				collectiveWinnings.five = collectiveWinnings.five + five;
-				return {
-					value: five,
-					details: five
-				};
-			case 6:
-				const six = calculatedPrize(0.025, odds.six);
-				prizesWon.six = prizesWon.six + 1;
-				collectiveWinnings.six = collectiveWinnings.six + six;
-				return {
-					value: six,
-					details: six
-				};
-			case 7:
-				const seven = calculatedPrize(0.8725, odds.jackpot);
-				prizesWon.jackpot = prizesWon.jackpot + 1;
-				collectiveWinnings.jackpot = collectiveWinnings.jackpot + seven;
-				return {
-					value: seven,
-					details: 'JACKPOT!!!!!'
-				};
-			default:
-				return {
-					value: -5,
-					details: '-'
-				}
-		}
-	}
-}
-
-function findWinners(lotteryResults, userNumbers) {
-	const wonBonuses = [];
-	const winningCounts = [];
-	const renderPlays = [];
-	const prizeDetails = [];
-	// Go through each play
-
-		userNumbers.forEach((play) => {
-			const renderNumber = [];
-			let winningCount = 0;
-			let wonBonus = false;
-
-			// Check numbers of each play.
-			play.forEach((number) => {
-
-				if (lotteryResults.selectedBalls.some((drawn) => drawn === number)) {
-					// A number was found!
-					numbersWon[number-1].count = numbersWon[number-1].count + 1 ;
-					winningCount = ++winningCount;
-					renderNumber.push(
-						<NumberBox
-							key={uuidv4()}
-							style={{
-								backgroundColor: 'lightGreen'
-							}}
-						>
-							{number}
-						</NumberBox>
-					)
-				} else if (number === lotteryResults.bonusBall) {
-					// Matched bonus!
-					numbersWon[number-1].count = numbersWon[number-1].count + 1 ;
-					wonBonus = true;
-					renderNumber.push(
-						<NumberBox
-							key={uuidv4()}
-							style={{
-								backgroundColor: 'yellow'
-							}}
-						>
-							{number}
-						</NumberBox>
-					)
-				} else {
-					// This number is a loser.
-					renderNumber.push(
-						<NumberBox
-							key={uuidv4()}
-						>
-							{number}
-						</NumberBox>
-					)
-				}
-		});
-
-		renderPlays.push(
-			<Row key={uuidv4()}>
-				{renderNumber}
-			</Row>
-		);
-		winningCounts.push(
-			<Row key={uuidv4()}>
-				{winningCount ? winningCount : '-'}
-			</Row>
-		);
-		wonBonuses.push(
-			<Row
-				style={{backgroundColor: `${wonBonus ? 'lightGreen' : 'white'}`}}
-				key={uuidv4()}
-			>
-				{wonBonus ? 'Yes' : '-'}
-			</Row>
-		);
-		prizeDetails.push(
-			<Row
-				key={uuidv4()}
-			>
-				{/*{prizeInfo(winningCount, wonBonus).details}*/}
-				<PrizeDetail winningCount wonBonus/>
-			</Row>
-		)
-
-	});
-	return {
-		wonBonuses,
-		winningCounts,
-		renderPlays,
-		prizeDetails
-	};
-}
-
-function PrizeDetail({winningCount, wonBonus}) {
-	const details = prizeInfo(winningCount, wonBonus).details;
-	return (
-		<div>
-			{details}
-		</div>
-	)
-};
-
-function renderUserPicks(userPicks, results) {
-	// Loop through the userPicks and highlight winners
-	const {wonBonuses, winningCounts, renderPlays, prizeDetails} = findWinners(results, userPicks);
+function RenderUserNumbers({entriesPerGame, results, manualPick}) {
+	const userPicks = quickPicks(entriesPerGame, manualPick);
+	const {renderPlays, winningCounts, wonBonuses, prizeDetails} = FindWinners(results, userPicks);
+	console.log(winningCounts);
 	return (
 		<>
 			<td>
@@ -457,7 +264,7 @@ function renderUserPicks(userPicks, results) {
 			</td>
 			<td>
 				<Column>
-				{winningCounts}
+					{winningCounts}
 				</Column>
 			</td>
 			<td>
@@ -471,15 +278,10 @@ function renderUserPicks(userPicks, results) {
 				</Column>
 			</td>
 		</>
-	)
+	);
 }
 
-function renderUserNumbers(numberOfPlays, results, manualPick) {
-	const userPicks = quickPicks(numberOfPlays, manualPick);
-	return renderUserPicks(userPicks, results)
-}
-
-function renderDrawResults(results) {
+function RenderDrawResults({results}) {
 	let lotteryResultsList = [];
 
 	results.selectedBalls.forEach((number) => {
