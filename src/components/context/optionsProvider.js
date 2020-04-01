@@ -35,6 +35,7 @@ export function OptionsProvider({children}) {
 	const [play, setPlay] = useState(false);
 	const [startAge, setStartAge] = useState(18);
 	const [ticketPrice, setTicketPrice] = useState(5);
+	const [loopEnded, setLoopEnded] = useState(false);
 
 	return (
 		<OptionsContext.Provider value={{
@@ -53,6 +54,8 @@ export function OptionsProvider({children}) {
 			ticketPrice,
 			jackpotPrize,
 			entriesPerGame,
+			loopEnded,
+			setLoopEnded,
 		}}>
 			{children}
 		</OptionsContext.Provider>

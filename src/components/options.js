@@ -26,7 +26,7 @@ export function Options() {
 			Number of Plays per Month
 			<input type='range' min="1" max='8' defaultValue={8} onChange={(e) => setPlaysPerMonth(e.target.value)}/>
 			Delay
-			<input type='range' min="1" max='200' defaultValue={8} onChange={(e) => setDelay(e.target.value)}/>
+			<input type='range' min="1" max='2000' defaultValue={8} onChange={(e) => setDelay(e.target.value)}/>
 			Current Age:
 			<input
 				type='number'

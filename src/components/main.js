@@ -11,11 +11,19 @@ import {OptionsContext} from "./context/optionsProvider";
 import {StatsContext} from "./context/statsProvider";
 
 export function Main() {
-	const {delay, play, setPlay, playsPerMonth} = useContext(OptionsContext);
+	const {delay, play, setPlay, playsPerMonth, loopEnded} = useContext(OptionsContext);
 	const {accumulateMonthCount, monthCount} = useContext(StatsContext);
 
 	useEffect(() => {
-		if (play) setTimeout(() => {accumulateMonthCount()}, delay)
+
+		if (play) {
+			setTimeout(() => {
+				accumulateMonthCount();
+			}, delay);
+		} else {
+			//TODO: slight delay after cancelling.
+			// return clearTimeout(timer);
+		}
 	}, [monthCount, play]);
 
 

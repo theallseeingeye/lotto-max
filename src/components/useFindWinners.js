@@ -1,8 +1,9 @@
 import {v4 as uuidv4} from "uuid";
-import React, {useContext, useState, useEffect} from "react";
+import React, {useContext, useState, useEffect, useLayoutEffect} from "react";
 import {numbersWon} from "./displayPlays";
 import styled from "styled-components";
 import {StatsContext} from "./context/statsProvider";
+import {OptionsContext} from "./context/optionsProvider";
 
 
 const NumberBox = styled.div`
@@ -22,190 +23,200 @@ const Row = styled.div`
 
 
 export function FindWinners(winningNumbers, userNumbers) {
-	const wonBonuses = [];
-	const winningCounts = [];
-	const renderPlays = [];
-	const prizeDetails = [];
-	const rawWinCount = [];
-	let wonBonus = false;
+	const [winningCounts, setWinningCounts] = useState([]);
+	const [renderPlays, setRenderPlays] = useState([]);
+	const [prizeDetails, setPrizeDetails] = useState([]);
+	const [wonBonuses, setWonBonuses] = useState([]);
 
+	useLayoutEffect(() => {
+		// Go through each play
+		userNumbers.forEach((play) => {
+			let renderPlay = [];
+			let winners = 0;
+			let wonBonus = false;
+			// setWonBonus(false);
+			// Check numbers of each play.
+			play.forEach((number) => {
+					// A number was found!
+				if (winningNumbers.selectedBalls.some((drawn) => drawn === number)) {
+					numbersWon[number - 1].count = numbersWon[number - 1].count + 1;
+					winners = ++winners;
+					renderPlay.push(
+						<NumberBox
+							key={uuidv4()}
+							style={{
+								backgroundColor: 'lightGreen'
+							}}
+						>
+							{number}
+						</NumberBox>
+					)
 
-	// Go through each play
-	userNumbers.forEach((play) => {
-		const renderNumber = [];
-		let winningCount = 0;
-		// setWonBonus(false);
-		// Check numbers of each play.
-		play.forEach((number) => {
-
-			if (winningNumbers.selectedBalls.some((drawn) => drawn === number)) {
-				// A number was found!
-				numbersWon[number - 1].count = numbersWon[number - 1].count + 1;
-				winningCount = ++winningCount;
-				renderNumber.push(
-					<NumberBox
-						key={uuidv4()}
-						style={{
-							backgroundColor: 'lightGreen'
-						}}
-					>
-						{number}
-					</NumberBox>
-				)
-			} else if (number === winningNumbers.bonusBall) {
 				// Matched bonus!
-				numbersWon[number - 1].count = numbersWon[number - 1].count + 1;
-				wonBonus = true;
-				renderNumber.push(
-					<NumberBox
-						key={uuidv4()}
-						style={{
-							backgroundColor: 'yellow'
-						}}
-					>
-						{number}
-					</NumberBox>
-				)
-			} else {
+				} else if (number === winningNumbers.bonusBall) {
+					numbersWon[number - 1].count = numbersWon[number - 1].count + 1;
+					wonBonus = true;
+					renderPlay.push(
+						<NumberBox
+							key={uuidv4()}
+							style={{
+								backgroundColor: 'yellow'
+							}}
+						>
+							{number}
+						</NumberBox>
+					)
+
 				// This number is a loser.
-				renderNumber.push(
-					<NumberBox
+				} else {
+					renderPlay.push(
+						<NumberBox
+							key={uuidv4()}
+						>
+							{number}
+						</NumberBox>
+					)
+				}
+			});
+
+			setRenderPlays(e => [
+					...e,
+					<Row key={uuidv4()}>
+						{renderPlay}
+					</Row>
+				]
+			);
+
+			setWinningCounts(count => [
+					...count,
+					<Row key={uuidv4()}>
+						{winners ? winners : '-'}
+					</Row>
+				]
+			);
+
+			setWonBonuses(e => [
+					...e,
+					<Row
+						style={{backgroundColor: `${wonBonus ? 'lightGreen' : 'white'}`}}
 						key={uuidv4()}
 					>
-						{number}
-					</NumberBox>
-				)
-			}
+						{wonBonus ? 'Yes' : '-'}
+					</Row>
+				]
+			);
+
+			setPrizeDetails(e => [
+				...e,
+				<Row
+					key={uuidv4()}
+				>
+					<PrizeDetails
+						winningCount={winners}
+						wonBonus={wonBonus}
+					/>
+				</Row>
+				]
+			)
 		});
-
-		renderPlays.push(
-			<Row key={uuidv4()}>
-				{renderNumber}
-			</Row>
-		);
-		winningCounts.push(
-			<Row key={uuidv4()}>
-				{winningCount ? winningCount : '-'}
-			</Row>
-		);
-		wonBonuses.push(
-			<Row
-				style={{backgroundColor: `${wonBonus ? 'lightGreen' : 'white'}`}}
-				key={uuidv4()}
-			>
-				{wonBonus ? 'Yes' : '-'}
-			</Row>
-		);
-		prizeDetails.push(
-			<Row
-				key={uuidv4()}
-			>
-				{PrizeInfo(winningCount, wonBonus)}
-			</Row>
-		)
-
-	});
+	},[]);
 
 	return {
 		wonBonuses,
 		winningCounts,
 		renderPlays,
-		prizeDetails
+		prizeDetails,
 	};
 }
 
+function PrizeDetails({winningCount, wonBonus}) {
+	const {details, prize} = prizeInfo(winningCount, wonBonus);
+	const {updatePrizeWon} = useContext(StatsContext);
 
-function PrizeInfo(winningCount, wonBonus) {
+	useEffect(() => {
+		if (prize !== 'none') {
+			updatePrizeWon(prize);
+		}
+	}, []);
+
+	return (
+		<Row
+			key={uuidv4()}
+		>
+			{details}
+		</Row>
+	)
+}
+
+
+function prizeInfo(winningCount, wonBonus) {
 	if (wonBonus) {
 		switch (winningCount) {
 			case 3:
-				// if (play) {
-				// prizesWon.threeBonus = prizesWon.threeBonus + 1;
-				// setPrizeWon('threeBonus');
-				// collectiveWinnings.threeBonus = collectiveWinnings.threeBonus + 20;
-				// }
-				return '$20';
+				return {
+					prize: 'threeBonus',
+					details: '$20'
+				};
 			case 4:
-				// setPrizeWon('fourBonus');
-				// const four = calculatedPrize(0.0275, odds.fourBonus);
-				// if (play) {
-				// 	// prizesWon.fourBonus = prizesWon.fourBonus + 1;
-				// 	collectiveWinnings.fourBonus = collectiveWinnings.fourBonus + four;
-				// 	prizesWon.fourBonus = prizesWon.fourBonus + 1;
-				// }
-				return '$20' ;
+				return {
+					prize: 'fourBonus',
+					details: '$20'
+				};
 			case 5:
-				// setPrizeWon('fiveBonus');
-				// const five = calculatedPrize(0.015, odds.fiveBonus);
-				// if (play) {
-				// 	collectiveWinnings.fiveBonus = collectiveWinnings.fiveBonus + five;
-				// 	prizesWon.fiveBonus = prizesWon.fiveBonus + 1;
-				// }
-				return '$20';
+				return {
+					prize: 'fiveBonus',
+					details: '$20'
+				};
 			case 6:
-				// setPrizeWon('sixBonus');
-				// const six = calculatedPrize(0.025, odds.sixBonus);
-				// if (play) {
-				// 	prizesWon.sixBonus = prizesWon.sixBonus + 1;
-				// 	collectiveWinnings.sixBonus = collectiveWinnings.sixBonus + six;
-				// }
-
-				return '$20';
+				return {
+					prize: 'sixBonus',
+					details: '$30'
+				};
 			case 7:
-				// setPrizeWon('jackpot');
-				// const seven = calculatedPrize(0.8725, odds.jackpot);
-				// if (play) {
-				// 	prizesWon.jackpot = prizesWon.jackpot + 1;
-				// 	collectiveWinnings.jackpot = collectiveWinnings.jackpot + seven;
-				// }
-				return '$20';
+				return {
+					prize: 'jackpot',
+					details: '$2131231231'
+				};
 			default:
-				return '-';
+				return {
+					prize: 'none',
+					details: '-'
+				}
 		}
 
 	} else {
 		// DID NOT WIN BONUS
 		switch (winningCount) {
 			case 3:
-				// setPrizeWon('three');
-				// if (play) {
-				// prizesWon.three = prizesWon.three + 1;
-				// }
-				return '$20';
-			case 4: {
-				// setPrizeWon('four');
-				// if (play) {
-				// 	prizesWon.four = prizesWon.four + 1;
-				// collectiveWinnings.four = collectiveWinnings.four + 20;
-				// }
-				return '$20';
-			}
+				return {
+					prize: 'three',
+					details: '$30'
+				};
+			case 4:
+				return {
+					prize: 'four',
+					details: '$50'
+				};
 			case 5:
-				// setPrizeWon('five');
-				// const five = calculatedPrize(0.0375, odds.five);
-				// if (play) {
-				// 	prizesWon.five = prizesWon.five + 1;
-				// 	collectiveWinnings.five = collectiveWinnings.five + five;
-				// }
-				return '$20';
+				return {
+					prize: 'five',
+					details: '$60'
+				};
 			case 6:
-				// setPrizeWon('Six');
-				// const six = calculatedPrize(0.025, odds.six);
-				// if (play) {
-				// 	prizesWon.six = prizesWon.six + 1;
-				// 	collectiveWinnings.six = collectiveWinnings.six + six;
-				// }
-				return '$20';
+				return {
+					prize: 'six',
+					details: '$70'
+				};
 			case 7:
-				// setPrizeWon('jackpot');
-				// const seven = calculatedPrize(0.8725, odds.jackpot);
-				// if (play) {
-				// 	prizesWon.jackpot = prizesWon.jackpot + 1;
-				// 	collectiveWinnings.jackpot = collectiveWinnings.jackpot + seven;
-				// }
-				return '$20';
+				return {
+					prize: 'jackpot',
+					details: 'Jackpot'
+				};
 			default:
-				return '-';
+				return {
+					prize: 'none',
+					details: '-'
+				}
 		}
 	}
 }

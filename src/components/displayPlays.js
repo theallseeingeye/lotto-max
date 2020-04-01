@@ -1,9 +1,8 @@
-import React, {useContext, useLayoutEffect, useEffect} from 'react';
+import React, {useContext, useState, useLayoutEffect, useEffect} from 'react';
 import {v4 as uuidv4} from "uuid";
 import styled from "styled-components";
 import {OptionsContext} from "./context/optionsProvider";
 import {usePrizeInfo} from "./usePrizeInfo";
-import {PrizeInfo} from "./usePrizeInfo";
 import {FindWinners} from "./useFindWinners";
 import {StatsContext} from "./context/statsProvider";
 
@@ -154,29 +153,41 @@ export let accumulatePlayCount = 0;
 
 function DisplayPlays(manualPick = null) {
 
-	const {playsPerMonth, entriesPerGame} = useContext(OptionsContext);
+	const {playsPerMonth, entriesPerGame, play} = useContext(OptionsContext);
+	const {monthCount} = useContext(StatsContext);
+	const [table, setTable] = useState([]);
 
+	useEffect(() => {
+		if (play) {
+			// Clear the table.
+			setTable([]);
 
-	let list = [];
-	for (let i = 0; i < playsPerMonth; i++) {
-		const results = drawResults(true);
-		accumulatePlayCount = ++accumulatePlayCount;
-		// calculateGlobalWinners();
-		list.push(
-			<tr key={uuidv4()}>
-				<td>
-					{i + 1}
-				</td>
-				<RenderDrawResults results={results}/>
-				<RenderUserNumbers
-					entriesPerGame={entriesPerGame}
-					results={results}
-					manualPick={null}
-				/>
-			</tr>
-		)
-	}
-	return list;
+			// Create the table.
+			for (let i = 0; i < playsPerMonth; i++) {
+				const results = drawResults(true);
+				accumulatePlayCount = ++accumulatePlayCount;
+				setTable(e => [
+						...e,
+						<tr key={uuidv4()}>
+							<td>
+								{i + 1}
+							</td>
+							<RenderDrawResults results={results}/>
+							<RenderUserNumbers
+								entriesPerGame={entriesPerGame}
+								results={results}
+								manualPick={null}
+							/>
+						</tr>
+					]
+				)
+			}
+		}
+
+		// The 'monthCount' subscribed to give a loop of updates by it's changes.
+	}, [play, monthCount]);
+
+	return table;
 }
 
 function generateEmptyNumberArray(numberOfBalls) {
@@ -254,7 +265,7 @@ function calculatedPrize(poolPercentage, oddsOfWinning) {
 function RenderUserNumbers({entriesPerGame, results, manualPick}) {
 	const userPicks = quickPicks(entriesPerGame, manualPick);
 	const {renderPlays, winningCounts, wonBonuses, prizeDetails} = FindWinners(results, userPicks);
-	console.log(winningCounts);
+
 	return (
 		<>
 			<td>
