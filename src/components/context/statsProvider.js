@@ -16,7 +16,7 @@ const prizes = {
 };
 
 export function StatsProvider({children}) {
-	const {playsPerMonth, prizeValue} = useContext(OptionsContext);
+	const {playsPerMonth, prizeValue, ticketPrice} = useContext(OptionsContext);
 	const [monthCount, setMonthCount] = useState(0);
 	const [playCount, setPlayCount] = useState(0);
 	const [prizesWon, setPrizesWon] = useState(prizes);
@@ -42,7 +42,7 @@ export function StatsProvider({children}) {
 		setPrizesWonTotal(e => {
 			return {
 				...e,
-				[prizeType]: [prizeType] + prizeValue[prizeType]
+				[prizeType]: e[prizeType] + prizeValue[prizeType]
 			}
 		})
 	}
@@ -52,11 +52,16 @@ export function StatsProvider({children}) {
 		updatePrizeTotalWon(prizeType)
 	}
 
+	function addLoss() {
+		setAccumulatedLoss(e => e - ticketPrice);
+	}
+
 	return (
 		<StatsContext.Provider value={{
 			accumulateMonthCount,
 			updatePrizeWon,
 			updatePrizeTotalWon,
+			addLoss,
 			addWin,
 			monthCount,
 			playCount,

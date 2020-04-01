@@ -33,7 +33,6 @@ export function FindWinners(winningNumbers, userNumbers) {
 			let renderPlay = [];
 			let winners = 0;
 			let wonBonus = false;
-			// setWonBonus(false);
 			// Check numbers of each play.
 			play.forEach((number) => {
 					// A number was found!
@@ -130,11 +129,10 @@ export function FindWinners(winningNumbers, userNumbers) {
 
 function PrizeDetails({winningCount, wonBonus}) {
 	const {details, prize} = prizeInfo(winningCount, wonBonus);
-	const {prizeValue, ticketPrice} = useContext(OptionsContext);
 	const {
 		updatePrizeWon,
 		addWin,
-		setAccumulatedLoss
+		addLoss,
 	} = useContext(StatsContext);
 
 	useEffect(() => {
@@ -144,7 +142,7 @@ function PrizeDetails({winningCount, wonBonus}) {
 				addWin(prize);
 			}
 		} else {
-			setAccumulatedLoss(e => e - ticketPrice);
+			addLoss();
 		}
 	}, []);
 
@@ -159,32 +157,33 @@ function PrizeDetails({winningCount, wonBonus}) {
 
 
 function prizeInfo(winningCount, wonBonus) {
+	const {prizeValue} = useContext(OptionsContext);
 	if (wonBonus) {
 		switch (winningCount) {
 			case 3:
 				return {
 					prize: 'threeBonus',
-					details: '$20'
+					details: `$${prizeValue['threeBonus']}`
 				};
 			case 4:
 				return {
 					prize: 'fourBonus',
-					details: '$20'
+					details: `$${prizeValue['fourBonus']}`
 				};
 			case 5:
 				return {
 					prize: 'fiveBonus',
-					details: '$20'
+					details: `$${prizeValue['fiveBonus']}`
 				};
 			case 6:
 				return {
 					prize: 'sixBonus',
-					details: '$30'
+					details: `$${prizeValue['sixBonus']}`
 				};
 			case 7:
 				return {
 					prize: 'jackpot',
-					details: '$2131231231'
+					details: `$${prizeValue['jackpot']}`
 				};
 			default:
 				return {
@@ -199,27 +198,27 @@ function prizeInfo(winningCount, wonBonus) {
 			case 3:
 				return {
 					prize: 'three',
-					details: '$30'
+					details: 'Free Play'
 				};
 			case 4:
 				return {
 					prize: 'four',
-					details: '$50'
+					details: `$${prizeValue['four']}`
 				};
 			case 5:
 				return {
 					prize: 'five',
-					details: '$60'
+					details: `$${prizeValue['five']}`
 				};
 			case 6:
 				return {
 					prize: 'six',
-					details: '$70'
+					details: `$${prizeValue['six']}`
 				};
 			case 7:
 				return {
 					prize: 'jackpot',
-					details: 'Jackpot'
+					details: `$${prizeValue['jackpot']}`
 				};
 			default:
 				return {

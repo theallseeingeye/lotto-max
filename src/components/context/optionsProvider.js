@@ -17,7 +17,7 @@ const wclc = {
 const awardValue = {
 	three: 5,
 	threeBonus: 20,
-	four: 0,
+	four: 20,
 	fourBonus: 0,
 	five: 0,
 	fiveBonus: 0,

@@ -21,7 +21,7 @@ export function Stats() {
 							{prizesWon.three}
 						</td>
 						<td>
-							{prizesWonTotal.three}
+							Free Play
 						</td>
 					</tr>
 					<tr>
