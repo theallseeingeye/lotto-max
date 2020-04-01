@@ -2,8 +2,7 @@ import React, {useContext, useState, useLayoutEffect, useEffect} from 'react';
 import {v4 as uuidv4} from "uuid";
 import styled from "styled-components";
 import {OptionsContext} from "./context/optionsProvider";
-import {usePrizeInfo} from "./usePrizeInfo";
-import {FindWinners} from "./useFindWinners";
+import {FindWinners} from "./findWinners";
 import {StatsContext} from "./context/statsProvider";
 
 const NumberBox = styled.div`
@@ -116,17 +115,6 @@ export const prizesWon = {
 	jackpot: 0,
 };
 
-export const collectiveWinnings = {
-	three: "Free Play",
-	threeBonus: 0,
-	four: 0,
-	fourBonus: 0,
-	five: 0,
-	fiveBonus: 0,
-	six: 0,
-	sixBonus: 0,
-	jackpot: 0,
-};
 
 
 export function RenderedDraws() {

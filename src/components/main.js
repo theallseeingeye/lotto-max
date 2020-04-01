@@ -11,7 +11,7 @@ import {OptionsContext} from "./context/optionsProvider";
 import {StatsContext} from "./context/statsProvider";
 
 export function Main() {
-	const {delay, play, setPlay, playsPerMonth, loopEnded} = useContext(OptionsContext);
+	const {delay, play, setPlay, playsPerMonth} = useContext(OptionsContext);
 	const {accumulateMonthCount, monthCount} = useContext(StatsContext);
 
 	useEffect(() => {
@@ -34,7 +34,7 @@ export function Main() {
 			<button onClick={() => setPlay(play => !play)}>
 				{play ? 'Stop' : 'Play'}
 			</button>
-			<RenderedDraws play={play} playsPerMonth={playsPerMonth}/>
+			<RenderedDraws/>
 			<Stats/>
 			<WinLoss/>
 			<div style={{height: '300px', width: '50%'}}>

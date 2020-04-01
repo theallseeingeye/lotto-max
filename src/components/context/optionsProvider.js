@@ -14,6 +14,18 @@ const wclc = {
 	provinceRev: 0.331,
 };
 
+const awardValue = {
+	three: 5,
+	threeBonus: 20,
+	four: 0,
+	fourBonus: 0,
+	five: 0,
+	fiveBonus: 0,
+	six: 0,
+	sixBonus: 0,
+	jackpot: 100000000,
+};
+
 export function OptionsProvider({children}) {
 	const [delay, setDelay] = useState(0);
 	const [endAge, setEndAge] = useState(85);
@@ -35,7 +47,7 @@ export function OptionsProvider({children}) {
 	const [play, setPlay] = useState(false);
 	const [startAge, setStartAge] = useState(18);
 	const [ticketPrice, setTicketPrice] = useState(5);
-	const [loopEnded, setLoopEnded] = useState(false);
+	const [prizeValue, setPrizeValue] = useState(awardValue);
 
 	return (
 		<OptionsContext.Provider value={{
@@ -54,8 +66,7 @@ export function OptionsProvider({children}) {
 			ticketPrice,
 			jackpotPrize,
 			entriesPerGame,
-			loopEnded,
-			setLoopEnded,
+			prizeValue
 		}}>
 			{children}
 		</OptionsContext.Provider>

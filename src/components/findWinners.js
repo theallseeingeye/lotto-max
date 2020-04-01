@@ -5,7 +5,6 @@ import styled from "styled-components";
 import {StatsContext} from "./context/statsProvider";
 import {OptionsContext} from "./context/optionsProvider";
 
-
 const NumberBox = styled.div`
 	width: 20px;
 	border: solid gray 0.1px;
@@ -131,11 +130,21 @@ export function FindWinners(winningNumbers, userNumbers) {
 
 function PrizeDetails({winningCount, wonBonus}) {
 	const {details, prize} = prizeInfo(winningCount, wonBonus);
-	const {updatePrizeWon} = useContext(StatsContext);
+	const {prizeValue, ticketPrice} = useContext(OptionsContext);
+	const {
+		updatePrizeWon,
+		addWin,
+		setAccumulatedLoss
+	} = useContext(StatsContext);
 
 	useEffect(() => {
 		if (prize !== 'none') {
 			updatePrizeWon(prize);
+			if (prize !== 'three') {
+				addWin(prize);
+			}
+		} else {
+			setAccumulatedLoss(e => e - ticketPrice);
 		}
 	}, []);
 

@@ -1,11 +1,8 @@
 import React, {useContext} from 'react'
-import {collectiveWinnings} from "./displayPlays";
 import {StatsContext} from "./context/statsProvider";
 
-
 export function Stats() {
-	const {monthCount, playCount, prizesWon} = useContext(StatsContext);
-
+	const {monthCount, playCount, prizesWon, prizesWonTotal} = useContext(StatsContext);
 	return (
 		<div>
 			Stats
@@ -24,7 +21,7 @@ export function Stats() {
 							{prizesWon.three}
 						</td>
 						<td>
-							{collectiveWinnings.three}
+							{prizesWonTotal.three}
 						</td>
 					</tr>
 					<tr>
@@ -35,7 +32,7 @@ export function Stats() {
 							{prizesWon.threeBonus}
 						</td>
 						<td>
-							{collectiveWinnings.threeBonus}
+							{prizesWonTotal.threeBonus}
 						</td>
 					</tr>
 					<tr>
@@ -46,7 +43,7 @@ export function Stats() {
 							{prizesWon.four}
 						</td>
 						<td>
-							{collectiveWinnings.four}
+							{prizesWonTotal.four}
 						</td>
 					</tr>
 					<tr>
@@ -57,7 +54,7 @@ export function Stats() {
 							{prizesWon.fourBonus}
 						</td>
 						<td>
-							{collectiveWinnings.fourBonus}
+							{prizesWonTotal.fourBonus}
 						</td>
 					</tr>
 					<tr>
@@ -68,7 +65,7 @@ export function Stats() {
 							{prizesWon.five}
 						</td>
 						<td>
-							{collectiveWinnings.five}
+							{prizesWonTotal.five}
 						</td>
 					</tr>
 					<tr>
@@ -79,7 +76,7 @@ export function Stats() {
 							{prizesWon.fiveBonus}
 						</td>
 						<td>
-							{collectiveWinnings.fiveBonus}
+							{prizesWonTotal.fiveBonus}
 						</td>
 					</tr>
 					<tr>
@@ -90,7 +87,7 @@ export function Stats() {
 							{prizesWon.six}
 						</td>
 						<td>
-							{collectiveWinnings.six}
+							{prizesWonTotal.six}
 						</td>
 					</tr>
 					<tr>
@@ -101,7 +98,7 @@ export function Stats() {
 							{prizesWon.sixBonus}
 						</td>
 						<td>
-							{collectiveWinnings.sixBonus}
+							{prizesWonTotal.sixBonus}
 						</td>
 					</tr>
 					<tr>
@@ -112,7 +109,7 @@ export function Stats() {
 							{prizesWon.jackpot}
 						</td>
 						<td>
-							{collectiveWinnings.jackpot}
+							{prizesWonTotal.jackpot}
 						</td>
 					</tr>
 				</tbody>
