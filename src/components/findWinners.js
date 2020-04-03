@@ -132,7 +132,6 @@ function PrizeDetails({winningCount, wonBonus}) {
 	const {
 		updatePrizeWon,
 		addWin,
-		addLoss,
 	} = useContext(StatsContext);
 
 	useEffect(() => {
@@ -141,8 +140,6 @@ function PrizeDetails({winningCount, wonBonus}) {
 			if (prize !== 'three') {
 				addWin(prize);
 			}
-		} else {
-			addLoss();
 		}
 	}, []);
 

@@ -1,5 +1,6 @@
 import React, {createContext, useContext, useState} from 'react'
 import {OptionsContext} from "./optionsProvider";
+import {numberOfPlayers} from "../globalWinners/population";
 
 export const StatsContext = createContext();
 
@@ -23,6 +24,8 @@ export function StatsProvider({children}) {
 	const [prizesWonTotal, setPrizesWonTotal] = useState(prizes);
 	const [accumulatedWin, setAccumulatedWin] = useState(0);
 	const [accumulatedLoss, setAccumulatedLoss] = useState(0);
+	const [currentPrize, setCurrentPrize] = useState(null);
+	const [totalPlayers, setTotalPlayers] = useState(numberOfPlayers());
 
 	function accumulateMonthCount() {
 		setMonthCount(count => count + 1);
@@ -30,6 +33,7 @@ export function StatsProvider({children}) {
 	}
 
 	function updatePrizeWon(prizeType) {
+		setCurrentPrize(prizeType);
 		setPrizesWon((prizesWon) => {
 			return ({
 				...prizesWon,
@@ -72,6 +76,9 @@ export function StatsProvider({children}) {
 			setAccumulatedWin,
 			accumulatedLoss,
 			setAccumulatedLoss,
+			currentPrize,
+			setCurrentPrize,
+			totalPlayers
 		}}>
 			{children}
 		</StatsContext.Provider>

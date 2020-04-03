@@ -4,6 +4,7 @@ import styled from "styled-components";
 import {OptionsContext} from "./context/optionsProvider";
 import {FindWinners} from "./findWinners";
 import {StatsContext} from "./context/statsProvider";
+import {SimulateGlobalWinners} from "./globalWinners";
 
 const NumberBox = styled.div`
 	width: 20px;
@@ -36,87 +37,6 @@ const Table = styled.table`
 	//width: 100%;
 `;
 
-
-const wclc = {
-	prizes: 0.521,
-	operatingCost: 0.068,
-	retailCommission: 0.07,
-	printing: 0.01,
-	provinceRev: 0.331,
-};
-// const jackpotPrize = 10000000;
-const jackpotPrize = 70000000;
-const canadianPop = 37590000;
-const playerPercentage = 0.25;
-const ticketPrice = 5;
-const numberOfPlayers = canadianPop * playerPercentage;
-const ticketSales = numberOfPlayers * ticketPrice;
-const prizePool = ticketSales * wclc.prizes;
-// The lottomax removes the fixed prizes first, then distribute the rest under the pool.
-
-// Simulate winners
-let totalPlaysNotWon = 0;
-
-const gameWinners = {
-	three: 0,
-	threeBonus: 0,
-	four: 0,
-	fourBonus: 0,
-	five: 0,
-	fiveBonus: 0,
-	six: 0,
-	sixBonus: 0,
-	jackpot: 0,
-};
-
-function calculateGlobalWinners() {
-	Object.keys(gameWinners).forEach((key) => {
-		if (key === 'jackpot') {
-			const numberOfWinners = Math.floor(odds[key] * totalPlaysNotWon);
-			if (numberOfWinners < 1) {
-				totalPlaysNotWon = numberOfPlayers + totalPlaysNotWon;
-			} else {
-				gameWinners[key] = numberOfWinners;
-				totalPlaysNotWon = 0;
-			}
-		} else {
-			const numberOfWinners = Math.floor(odds[key] * numberOfPlayers);
-			gameWinners[key] = numberOfWinners;
-		}
-	});
-}
-
-const odds = {
-	three: 1/8.5,
-	threeBonus: 1/82.9,
-	four: 1/82.9,
-	fourBonus: 1/105,
-	five: 1/1841,
-	fiveBonus: 1/37749,
-	six: 1/113248,
-	sixBonus: 1/4756400,
-	jackpot: 1/33294800,
-};
-
-console.log(prizePool);
-
-const pool = ticketSales > jackpotPrize ? ticketSales - jackpotPrize : jackpotPrize;
-const poolFunds = pool <= 0 ? jackpotPrize * (1-0.8725) : pool * (1-0.8725);
-
-export const prizesWon = {
-	three: 0,
-	threeBonus: 0,
-	four: 0,
-	fourBonus: 0,
-	five: 0,
-	fiveBonus: 0,
-	six: 0,
-	sixBonus: 0,
-	jackpot: 0,
-};
-
-
-
 export function RenderedDraws() {
 	return (
 		<Table>
@@ -140,18 +60,19 @@ export const numbersWon = generateEmptyNumberArray(50);
 export let accumulatePlayCount = 0;
 
 function DisplayPlays(manualPick = null) {
-
 	const {playsPerMonth, entriesPerGame, play} = useContext(OptionsContext);
-	const {monthCount} = useContext(StatsContext);
+	const {monthCount, addLoss} = useContext(StatsContext);
 	const [table, setTable] = useState([]);
+
+	SimulateGlobalWinners();
 
 	useEffect(() => {
 		if (play) {
 			// Clear the table.
 			setTable([]);
-
 			// Create the table.
 			for (let i = 0; i < playsPerMonth; i++) {
+				addLoss();
 				const results = drawResults(true);
 				accumulatePlayCount = ++accumulatePlayCount;
 				setTable(e => [
@@ -241,13 +162,6 @@ function drawResults(includeBonus) {
 		}
 	}
 	return includeBonus ? {selectedBalls, bonusBall} : {selectedBalls};
-}
-
-function calculatedPrize(poolPercentage, oddsOfWinning) {
-	const totalPriceShare = poolPercentage * poolFunds;
-	const numberOfWinners  = numberOfPlayers * oddsOfWinning;
-	const finalPrize = totalPriceShare / numberOfWinners;
-	return Math.round(finalPrize);
 }
 
 function RenderUserNumbers({entriesPerGame, results, manualPick}) {

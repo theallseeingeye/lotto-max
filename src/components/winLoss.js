@@ -10,7 +10,7 @@ export function WinLoss() {
 	return(
 		<>
 			Wins: {accumulatedWin} <br/>
-			Loss: {accumulatedLoss} <br/>
+			Ticket Purchases: {accumulatedLoss} <br/>
 			Total: {accumulatedWin + accumulatedLoss} <br/>
 		</>
 	)
