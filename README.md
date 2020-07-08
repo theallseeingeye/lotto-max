@@ -1,3 +1,4 @@
-Lottery.
+# Canadian Lotto Max Simulator
 
-What are your chances?
+##  Development
+To run the development environment: 'npm run develop'
