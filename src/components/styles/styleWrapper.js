@@ -15,7 +15,7 @@ const theme = {
 };
 
 
-export const Styles = ({children}) => {
+export const StyleWrapper = ({children}) => {
 	return (
 		<>
 			<ThemeProvider theme={theme}>

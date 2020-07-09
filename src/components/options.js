@@ -21,8 +21,8 @@ export function Options() {
 
 	return(
 		<div>
-			Options <br/>
-
+			Are you feeling lucky that you will the LottoMax in your life time? <br/>
+			Please select your age and see if you do! <br/>
 			Number of Plays per Month
 			<input type='range' min="1" max='8' defaultValue={8} onChange={(e) => setPlaysPerMonth(e.target.value)}/>
 			Delay

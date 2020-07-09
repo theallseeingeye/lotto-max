@@ -2,26 +2,17 @@ import {createGlobalStyle} from 'styled-components'
 
 export const GlobalStyles = createGlobalStyle`
 	@font-face {
-		font-family: "Merriweather";
-		font-weight: 300;
-		//font-style: light;
-		src: url.("../fonts/merriweather-300.woff2") format("woff"),
+		font-family: "Faster One";
+		font-weight: 400;
+		src: url("./src/components/styles/fonts/FasterOne-Regular.ttf");
+	}
+	
+	@font-face {
+		font-family: "PT Sans";
+		font-weight: 700;
+		src: url("./src/components/styles/fonts/PTSans-Italic.ttf");
 	}
 
-	@font-face {
-		font-family: "Montserrat";
-		font-weight: 700;
-		//font-style: light;
-		src: url.("../fonts/montserrat-700.woff2") format("woff"),
-	}
-	
-	@font-face {
-		font-family: "Montserrat";
-		font-weight: 900;
-		//font-style: light;
-		src: url.("../fonts/montserrat-900.woff2") format("woff"),
-	}
-	
 	* {
 		box-sizing: border-box; 
 	}
@@ -31,25 +22,14 @@ export const GlobalStyles = createGlobalStyle`
 		width: 100%;
 		margin: 0 auto;
 		padding: 0;
-		font-family: Montserrat, sans-serif;
-		font-weight: 700;
-		
+		/* font-family: Montserrat, sans-serif; */
+		/* font-weight: 700; */
 	}
+
 	h1 {
-		font-family: Montserrat, sans-serif;
-		font-weight: 900;
+		font-family: "PT Sans";
+		font-size: 2em;
 	}
-	h2 {
-		font-family: Monserrat, sans-serif;
-		font-weight: 700;
-	}
-	h3 {
-		font-family: Merriweather, serif;
-		font-weight: 300;
-	}
-	p {
-		font-family: Merriweather, serif;
-		font-weight: 300;
-	}
+
 `;
 
