@@ -9,8 +9,15 @@ export const GlobalStyles = createGlobalStyle`
 	
 	@font-face {
 		font-family: "PT Sans";
-		font-weight: 700;
+		font-style: italic;
+		font-weight: 400;
 		src: url("./src/components/styles/fonts/PTSans-Italic.ttf");
+	}
+
+	@font-face {
+		font-family: "PT Sans";
+		font-weight: 400;
+		src: url("./src/components/styles/fonts/PTSans-Regular.ttf");
 	}
 
 	* {
@@ -28,7 +35,13 @@ export const GlobalStyles = createGlobalStyle`
 
 	h1 {
 		font-family: "PT Sans";
+		font-style: italic;
 		font-size: 2em;
+	}
+
+	h2 {
+		font-family: "PT Sans";
+		font-size: 1em;
 	}
 
 `;

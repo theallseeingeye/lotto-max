@@ -6,7 +6,7 @@ import {NumbersWonChart} from "./numbersWonChart";
 import {Stats} from "./stats";
 import {WinLoss} from "./winLoss";
 import {Header} from "./header";
-import {Options} from "./options";
+import {SelectOptions} from "./selectOptions";
 import {OptionsContext} from "./context/optionsProvider";
 import {StatsContext} from "./context/statsProvider";
 
@@ -30,7 +30,7 @@ export function Main() {
 	return(
 		<div>
 			<Header/>
-			<Options/>
+			<SelectOptions/>
 			<button onClick={() => setPlay(play => !play)}>
 				{play ? 'Stop' : 'Play'}
 			</button>

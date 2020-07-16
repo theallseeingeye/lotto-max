@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import lottoMax from '../../public/Lotto_Max_Logo.png'
 
 const Container = styled.div`
-	border: solid red;
 	display: flex;
 	justify-content:center;
 `;
@@ -19,13 +18,7 @@ const SubTitle = styled.div`
 	font-size: 3em;
 `;
 
-const Motto = styled.h1`
-	text-align: center;
-`;
-
 export function Header() {
-
-
 	return (
 		<Container>			
 			<div>
@@ -37,9 +30,7 @@ export function Header() {
 						SIMULATOR
 					</SubTitle>
 				</Title>
-				<Motto>
-					What Are Your Chances?
-				</Motto>
+
 			</div>
 		</Container>
 	)
