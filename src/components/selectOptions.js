@@ -5,6 +5,9 @@ import tombstone from '../svg/tombstone.svg';
 import baby from '../svg/baby.svg';
 import {GenderToggle} from './GenderToggle';
 import {AgeImg} from './ageImg';
+import arrow from '../svg/arrow.svg';
+import add from '../svg/add.svg';
+import subtract from '../svg/subtract.svg';
 
 const Container = styled.div`
 	display: flex;
@@ -69,6 +72,7 @@ const AgeFlex = styled.div`
 	display: flex;
 	flex-direction: row;
 	margin-top: 2em;
+	justify-content: center;
 `;
 
 const StartAgeImg = styled.img`
@@ -83,10 +87,42 @@ const StartAgeImg = styled.img`
 
 const Years = styled.div`
 	padding: 5px;
-	text-align: center;
+	width: 15%;
+	/* text-align: center; */
 	display: flex;
 	flex-direction: column;
 	justify-content: space-evenly;
+	align-items: center;
+`;
+
+const Arrow = styled.img`
+	width: 100%;
+`;
+
+const StackedArrow = styled.div`
+	position: relative;
+	width: 100%;
+`;
+
+const AgeDiff = styled.div`
+	position: absolute;
+	font-family: "PT Sans";
+	font-size: 0.8em;
+	border: solid black;
+	background-color: white;
+	padding: 1px;
+	padding-left: 2px;
+	padding-right: 2px;
+	width: fit-content;
+	border-radius: 5px;
+	top: 47%;
+	left: 40%;
+	transform: translate(-50%, -50%);	
+`;
+
+const UpDown = styled.img`
+	width: 50px;
+	padding: 5px;
 `;
 
 export function SelectOptions() {
@@ -95,6 +131,7 @@ export function SelectOptions() {
 		setStartAge,
 		setDelay,
 		setPlaysPerMonth,
+		playsPerMonth,
 		setEndAge,
 		endAge,
 		gender,
@@ -108,10 +145,8 @@ export function SelectOptions() {
 		}
 	}
 
-	// To set the life expectancy of the person's age.
+	/* // To set the life expectancy of the person's age. */
 	
-
-
 	return(
 		<Container>
 			<Motto>
@@ -123,7 +158,9 @@ export function SelectOptions() {
 			</Instructions>
 			<AgeFlex>
 				<AgeContainer>
-					<div onClick={() => setStartAge(current => current + 1)}>+</div>
+					<div onClick={() => setStartAge(current => current + 1)}>
+						<UpDown src={add}/>
+					</div>
 					<Stacked>
 						<AgeImg age={startAge} sex={gender}/>
 						<AgeInput
@@ -131,19 +168,26 @@ export function SelectOptions() {
 							onChange={(e) => setStartAge(e.target.value)}
 						/>
 					</Stacked>
-					<div onClick={() => setStartAge(current => current - 1)}>-</div>
+					<div onClick={() => setStartAge(current => current - 1)}>
+						<UpDown src={subtract}/>
+					</div>
 					<AgeType>
 						Current Age
 					</AgeType>
 				</AgeContainer>
 				<Years>
-					<div>
-						{endAge - startAge} Years
-					</div>
+					<StackedArrow>
+						<Arrow src={arrow}/>
+						<AgeDiff>
+							{endAge - startAge} Years
+						</AgeDiff>
+					</StackedArrow>
 					<GenderToggle/>
 				</Years>
 				<AgeContainer>
-					<div onClick={() => setEndAge(current => current + 1)}>+</div>
+					<div onClick={() => setEndAge(current => current + 1)}>
+						<UpDown src={add}/>
+					</div>
 					<Stacked>
 						<Tombstone src={tombstone}/>
 						<AgeInput
@@ -151,7 +195,9 @@ export function SelectOptions() {
 							onChange={(e) => setEndAge(e.target.value)}
 						/>
 					</Stacked>
-					<div onClick={() => setEndAge(current => current - 1)}>-</div>
+					<div onClick={() => setEndAge(current => current - 1)}>
+						<UpDown src={subtract}/>
+					</div>
 					<AgeType>
 						Life Expectancy
 					</AgeType>
@@ -159,7 +205,7 @@ export function SelectOptions() {
 			</AgeFlex>
 			<div>
 				<PlaysTitle>
-					Number of Plays per Month
+					{playsPerMonth} Plays per Month
 				</PlaysTitle>
 				<input type='range' min="1" max='8' defaultValue={8} onChange={(e) => setPlaysPerMonth(e.target.value)}/>
 				<div>
