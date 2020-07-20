@@ -37,12 +37,18 @@ export function OptionsProvider({children}) {
 	const [startAge, setStartAge] = useState(18);
 	const [ticketPrice, setTicketPrice] = useState(5);
 	const [prizeValue, setPrizeValue] = useState(awardValue);
+	const [gender, setGender] = useState('male')
 
 	function didWin(prizeType) {
 		// console.log(odds.four * numberOfPlayers);
 		// const winningOdds = odds[prizeType] * numberOfPlayers;
 		// console.log(winningOdds, numberOfPlayers);
 		// return Math.random() < winningOdds;
+	}
+
+	function updateGender(gender) {
+		if (gender !== 'male' && gender !== 'female') return console.log('Not an appropriate gender. Received ', gender);
+		setGender(gender);
 	}
 
 	return (
@@ -63,7 +69,9 @@ export function OptionsProvider({children}) {
 			entriesPerGame,
 			prizeValue,
 			setPrizeValue,
-			didWin
+			didWin,
+			updateGender,
+			gender
 		}}>
 			{children}
 		</OptionsContext.Provider>
