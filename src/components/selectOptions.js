@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import tombstone from '../svg/tombstone.svg';
 import baby from '../svg/baby.svg';
 import {GenderToggle} from './GenderToggle';
+import {AgeImg} from './ageImg';
 
 const Container = styled.div`
 	display: flex;
@@ -80,6 +81,14 @@ const StartAgeImg = styled.img`
 	transform: translate(-50%, -50%);	
 `;
 
+const Years = styled.div`
+	padding: 5px;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+`;
+
 export function SelectOptions() {
 	const {
 		startAge,
@@ -87,7 +96,8 @@ export function SelectOptions() {
 		setDelay,
 		setPlaysPerMonth,
 		setEndAge,
-		endAge
+		endAge,
+		gender,
 	} = useContext(OptionsContext);
 
 	function startAgeBeforeEnd() {
@@ -97,6 +107,10 @@ export function SelectOptions() {
 			return endAge;
 		}
 	}
+
+	// To set the life expectancy of the person's age.
+	
+
 
 	return(
 		<Container>
@@ -109,39 +123,35 @@ export function SelectOptions() {
 			</Instructions>
 			<AgeFlex>
 				<AgeContainer>
+					<div onClick={() => setStartAge(current => current + 1)}>+</div>
 					<Stacked>
-						<StartAgeImg src={baby}/>
+						<AgeImg age={startAge} sex={gender}/>
 						<AgeInput
-							// type='number'
-							// min={0}
-							// max={125}
-							defaultValue={40}
+							value={startAge}
 							onChange={(e) => setStartAge(e.target.value)}
 						/>
 					</Stacked>
-					<GenderToggle/>
+					<div onClick={() => setStartAge(current => current - 1)}>-</div>
 					<AgeType>
 						Current Age
 					</AgeType>
 				</AgeContainer>
-				<div>
-					Years
+				<Years>
 					<div>
-						23
+						{endAge - startAge} Years
 					</div>
-				</div>
+					<GenderToggle/>
+				</Years>
 				<AgeContainer>
+					<div onClick={() => setEndAge(current => current + 1)}>+</div>
 					<Stacked>
 						<Tombstone src={tombstone}/>
 						<AgeInput
-							// type='number'
-							// min={startAgeBeforeEnd()}
-							// value={startAgeBeforeEnd()}
-							// max={126}
-							defaultValue={44}
+							value={endAge}
 							onChange={(e) => setEndAge(e.target.value)}
-							/>
+						/>
 					</Stacked>
+					<div onClick={() => setEndAge(current => current - 1)}>-</div>
 					<AgeType>
 						Life Expectancy
 					</AgeType>

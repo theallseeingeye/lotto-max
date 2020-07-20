@@ -26,12 +26,16 @@ export function Main() {
 		}
 	}, [monthCount, play]);
 
+	function playButtonClick(e) {
+		e.preventDefault();
+		setPlay(play => !play);
+	}
 
 	return(
 		<div>
 			<Header/>
 			<SelectOptions/>
-			<button onClick={() => setPlay(play => !play)}>
+			<button onClick={playButtonClick}>
 				{play ? 'Stop' : 'Play'}
 			</button>
 			<RenderedDraws/>

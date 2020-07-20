@@ -29,6 +29,11 @@ export const GlobalStyles = createGlobalStyle`
 		width: 100%;
 		margin: 0 auto;
 		padding: 0;
+
+		/* To stop text highlight from cursor */
+		user-select: none;
+
+
 		/* font-family: Montserrat, sans-serif; */
 		/* font-weight: 700; */
 	}

@@ -73,8 +73,13 @@ export function GenderToggle() {
         }
     }, [buttonLeft])
 
+    function handleClick(e) {
+        e.preventDefault();
+        return setButtonLeft(prev => !prev);
+    }
+
     return (
-        <Container onClick={() => setButtonLeft(prev => !prev)}>
+        <Container onClick={handleClick}>
             <ButtonBackground/>
             <Circle buttonSide={buttonLeft}/>                
             <InnerLeft>

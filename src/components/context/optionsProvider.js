@@ -34,7 +34,7 @@ export function OptionsProvider({children}) {
 	});
 	const [playsPerMonth, setPlaysPerMonth] = useState(8);
 	const [play, setPlay] = useState(false);
-	const [startAge, setStartAge] = useState(18);
+	const [startAge, setStartAge] = useState(40);
 	const [ticketPrice, setTicketPrice] = useState(5);
 	const [prizeValue, setPrizeValue] = useState(awardValue);
 	const [gender, setGender] = useState('male')
