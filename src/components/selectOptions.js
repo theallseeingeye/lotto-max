@@ -8,6 +8,7 @@ import {AgeImg} from './ageImg';
 import arrow from '../svg/arrow.svg';
 import add from '../svg/add.svg';
 import subtract from '../svg/subtract.svg';
+import {useHoldPress} from './hooks/useHoldPress';
 
 const Container = styled.div`
 	display: flex;
@@ -123,6 +124,7 @@ const AgeDiff = styled.div`
 const UpDown = styled.img`
 	width: 50px;
 	padding: 5px;
+	cursor: pointer;
 `;
 
 export function SelectOptions() {
@@ -135,17 +137,17 @@ export function SelectOptions() {
 		setEndAge,
 		endAge,
 		gender,
+		updateEndAge,
+		increaseEndAge,
+		decreaseEndAge,
+		increaseStartAge,
+		decreaseStartAge,
 	} = useContext(OptionsContext);
 
-	function startAgeBeforeEnd() {
-		if (startAge >= endAge) {
-			return parseInt(startAge) + 1
-		} else {
-			return endAge;
-		}
-	}
-
-	/* // To set the life expectancy of the person's age. */
+	const pressEndAgeIncrease = useHoldPress(increaseEndAge)
+	const pressEndAgeDecrease = useHoldPress(decreaseEndAge)
+	const pressStartAgeIncrease = useHoldPress(increaseStartAge);
+	const pressStartAgeDecrease = useHoldPress(decreaseStartAge);
 	
 	return(
 		<Container>
@@ -158,7 +160,7 @@ export function SelectOptions() {
 			</Instructions>
 			<AgeFlex>
 				<AgeContainer>
-					<div onClick={() => setStartAge(current => current + 1)}>
+					<div {...pressStartAgeIncrease}>
 						<UpDown src={add}/>
 					</div>
 					<Stacked>
@@ -168,7 +170,7 @@ export function SelectOptions() {
 							onChange={(e) => setStartAge(e.target.value)}
 						/>
 					</Stacked>
-					<div onClick={() => setStartAge(current => current - 1)}>
+					<div {...pressStartAgeDecrease}>
 						<UpDown src={subtract}/>
 					</div>
 					<AgeType>
@@ -179,23 +181,23 @@ export function SelectOptions() {
 					<StackedArrow>
 						<Arrow src={arrow}/>
 						<AgeDiff>
-							{endAge - startAge} Years
+							{endAge - startAge} Year{(endAge - startAge) <= 1 ? null : 's'}
 						</AgeDiff>
 					</StackedArrow>
 					<GenderToggle/>
 				</Years>
 				<AgeContainer>
-					<div onClick={() => setEndAge(current => current + 1)}>
+					<div {...pressEndAgeIncrease}>
 						<UpDown src={add}/>
 					</div>
 					<Stacked>
 						<Tombstone src={tombstone}/>
 						<AgeInput
 							value={endAge}
-							onChange={(e) => setEndAge(e.target.value)}
+							onChange={(e) => updateEndAge(e.target.value)}
 						/>
 					</Stacked>
-					<div onClick={() => setEndAge(current => current - 1)}>
+					<div {...pressEndAgeDecrease}>
 						<UpDown src={subtract}/>
 					</div>
 					<AgeType>

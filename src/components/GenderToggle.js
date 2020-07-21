@@ -39,7 +39,7 @@ const Circle = styled.div`
     border-width: 2px;
     border-radius: 25px 25px 25px 25px;
     width: 50%;
-    height: 95%;
+    height: 97%;
     position: absolute;
     /* Use this value to toggle either side. Use transition over. */
     right: ${props => props.buttonSide ? 1 : 0}; 
